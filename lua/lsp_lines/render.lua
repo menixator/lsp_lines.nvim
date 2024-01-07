@@ -78,7 +78,7 @@ function M.show(namespace, bufnr, diagnostics, opts, source)
 
       -- if both diagnostics are on the same position
       -- remove it
-      if next_diagnostic.lnum == v.lnum and next_diagnostic.col == v.col and diagnostic.code == v.diagnostic then
+      if next_diagnostic.lnum == v.lnum and next_diagnostic.col == v.col and next_diagnostic.code == v.diagnostic then
         filtered[#filtered + 1] = k
       end
     end
