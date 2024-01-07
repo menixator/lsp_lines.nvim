@@ -45,7 +45,9 @@ end
 ---@param opts boolean|Opts
 ---@param source 'native'|'coc'|nil If nil, defaults to 'native'.
 function M.show(namespace, bufnr, diagnostics, opts, source)
-  if not vim.api.nvim_buf_is_loaded(bufnr) then return end
+  if not vim.api.nvim_buf_is_loaded(bufnr) then
+    return
+  end
   vim.validate({
     namespace = { namespace, "n" },
     bufnr = { bufnr, "n" },
@@ -65,10 +67,32 @@ function M.show(namespace, bufnr, diagnostics, opts, source)
     end
   end)
 
+  local filtered = {}
+
+  local diagnostic_count = #diagnostics
+  println(diagnostics)
+
+  for k, v in pairs(diagnostics) do
+    if k + 1 <= diagnostic_count then
+      local next_diagnostic = diagnostics[k + 1]
+
+      -- if both diagnostics are on the same position
+      -- remove it
+      if next_diagnostic.lnum == v.lnum and next_diagnostic.col == v.col and diagnostic.code == v.diagnostic then
+        filtered[#filtered + 1] = k
+      end
+    end
+  end
+
+  for i = #filtered, 1, -1 do
+    table.remove(diagnostic, i)
+  end
+
   vim.api.nvim_buf_clear_namespace(bufnr, namespace, 0, -1)
   if #diagnostics == 0 then
     return
   end
+
   local highlight_groups = HIGHLIGHTS[source or "native"]
 
   -- This loop reads line by line, and puts them into stacks with some
